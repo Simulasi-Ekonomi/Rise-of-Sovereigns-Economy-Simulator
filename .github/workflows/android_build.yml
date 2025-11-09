@@ -15,7 +15,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Unzip project
-        run: unzip Rise_of_Sovereigns_build_ready_v1.1.zip -d ./project
+        run: |
+          unzip Rise_of_Sovereigns_build_ready_v1.1.zip -d ./src
+          cd src
+          # Deteksi folder dalam ZIP
+          ROOT_DIR=$(ls -d */ | head -n 1)
+          echo "Detected project folder: $ROOT_DIR"
+          mv "$ROOT_DIR"/* .
+          rm -rf "$ROOT_DIR"
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -30,16 +37,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd project
+          cd src
           flutter pub get
 
       - name: Build release APK
         run: |
-          cd project
+          cd src
           flutter build apk --release
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: Rise_of_Sovereigns_v1.1_release
-          path: project/build/app/outputs/flutter-apk/app-release.apk
+          path: src/build/app/outputs/flutter-apk/app-release.apk
